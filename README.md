@@ -1,49 +1,100 @@
-# Movie Industry Analysis & Prediction
+# Movie Industry Analysis and Prediction
 
-Academic research project developed for the Special Topics in Artificial Intelligence course.
+An exploratory machine-learning study of the factors associated with movie ratings and commercial performance. The notebook combines data cleaning, visualization, classical models, time-series summaries, and two neural-network baselines.
 
-This study investigates the key factors influencing movie success. The objective is to predict both commercial performance (Box Office) and critical reception (IMDb Score) by applying statistical analysis and Machine Learning algorithms on a dataset of over 13,000 films.
+> [!NOTE]
+> This is an academic analysis, not a production forecasting system. Reported metrics describe held-out samples from the included dataset and should not be generalized to future releases without additional temporal validation.
 
-## Methodology
+## Research questions
 
-The project follows a structured Data Science pipeline:
+- How are critic scores, audience scores, duration, release date, and financial variables related?
+- Which features are associated with commercial success?
+- Can baseline models classify rating tiers or estimate IMDb scores?
+- How did monthly release and box-office patterns change over time?
 
-**Data Cleaning & Mining:** Processing raw data, handling currency conversion, parsing complex string features (genres, actors), and treating missing values.
+## Analysis workflow
 
-**Exploratory Data Analysis (EDA):** In-depth visualization using Correlation Matrices, 3D Plots, and Time Series analysis to detect seasonal trends and feature relationships.
+1. Load the raw CSV directly from `IMDb Movies.zip`.
+2. Normalize identifiers, dates, numeric columns, and list-valued text fields.
+3. Retain financial values explicitly denominated in US dollars.
+4. Explore leading movies, actors, genres, and numeric correlations.
+5. Fit linear regression, logistic regression, and linear SVC baselines.
+6. Summarize monthly release, rating, and box-office trends.
+7. Train neural networks for success classification and score regression.
 
-**Preprocessing:** Application of Standard Scaling and Multi-Label Binarization for categorical data.
+The commercial-success target is defined as profit above USD 50 million and a profit margin of at least `1.0`. Rating classes are defined in the notebook before the SVC model.
 
-## Models Implemented
+## Repository data
 
-Various models were tested to solve Regression and Classification tasks:
+| File | Purpose |
+| --- | --- |
+| `IMDb Movies.zip` | Raw source archive containing `IMDb Movies.csv` |
+| `IMDb_Movies_Updated.csv` | Processed checkpoint from the original analysis |
+| `movie-analysis.ipynb` | Reproducible cleaning, analysis, and modeling workflow |
 
-- Linear Regression: Simple and Multiple regression models to estimate IMDb scores based on metascore, duration, and release year.
+> [!IMPORTANT]
+> The original repository did not document the external dataset source or license. Confirm the provenance and redistribution terms before reusing or publishing the data outside this academic project.
 
-- Logistic Regression: Binary classification to predict Box Office success based on profit margins.
+The notebook reads the ZIP archive directly; manual extraction is not required. The processed checkpoint is provided for inspection, but rerunning the cleaning section is the authoritative way to reproduce the current transformation logic.
 
-- Linear SVC: Support Vector Machine used to classify movies into rating tiers (Bad, Mid, Good).
+## Environment setup
 
-- Deep Learning (DNN): Neural Networks built with TensorFlow/Keras for both Score Regression and Success Classification.
+Python 3.10 or newer is recommended.
 
-## Technologies
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
 
-- Python 3 (Jupyter Notebook)
+Start JupyterLab:
 
-- Pandas & NumPy
+```bash
+jupyter lab movie-analysis.ipynb
+```
 
-- Scikit-Learn
+Run the cells from top to bottom. TensorFlow training is the most resource-intensive stage and may take several minutes, depending on the machine.
 
-- TensorFlow / Keras
+> [!TIP]
+> The notebook sets NumPy and TensorFlow seeds for repeatable splits and initialization. Hardware, library versions, and parallel numerical operations can still produce small differences.
 
-- Matplotlib & Seaborn
+## Models and metrics
 
-## How to Run
+| Task | Model | Main metrics |
+| --- | --- | --- |
+| IMDb score estimation | Linear regression | RMSE, R² |
+| Commercial-success classification | Logistic regression | Precision, recall, F1, ROC AUC |
+| Rating-tier classification | Linear SVC | Precision, recall, F1, confusion matrix |
+| Commercial-success classification | Dense neural network | Accuracy, ROC AUC |
+| IMDb score estimation | Dense neural network | MSE, RMSE, MAE |
 
-Install the required libraries:
+## Validation
 
-`pip install pandas numpy matplotlib seaborn scikit-learn tensorflow`
+Run the lightweight repository validation without installing the scientific stack:
 
-Open the Jupyter Notebook:
+```bash
+python3 scripts/validate_notebook.py
+```
 
-`jupyter notebook movie-analysis.ipynb`
+This checks the notebook schema, Python syntax, cleared outputs, required section headings, and both data-file schemas. It does not train the models.
+
+## Project structure
+
+```text
+.
+├── IMDb Movies.zip
+├── IMDb_Movies_Updated.csv
+├── movie-analysis.ipynb
+├── requirements.txt
+└── scripts/
+    └── validate_notebook.py
+```
+
+## Methodological limitations
+
+- The dataset may contain selection bias and incomplete financial observations.
+- USD-only filtering reduces currency ambiguity but also removes many international financial records.
+- Random train/test splits do not simulate prediction of genuinely future releases.
+- Preprocessing in the exploratory classification sections is fitted before the split, so their reported metrics may be mildly optimistic.
+- Correlations and the 2019–2020 comparison are descriptive, not causal.
